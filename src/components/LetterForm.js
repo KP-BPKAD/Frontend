@@ -1,7 +1,7 @@
 // src/components/LetterForm.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api from '../services/api';
+import { downloadUrl } from '../services/api';
 import { Container, Form, Button, Row, Col, Card, Alert } from 'react-bootstrap';
 
 const LetterForm = ({ isEdit = false, isView = false }) => {
