@@ -12,7 +12,7 @@ import axios from 'axios';
 // pastikan untuk mengganti baseURL sesuai dengan URL backend Anda. 
 // Contohnya:
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',// diganti dengan URL backend Anda // baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api', //
+  baseURL: 'https://backend-production-366f1.up.railway.app/api',
 });
 
 // Tambahkan token otomatis ke setiap request
