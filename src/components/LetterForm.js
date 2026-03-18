@@ -1,7 +1,8 @@
 // src/components/LetterForm.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { downloadUrl } from '../services/api';
+// Impor api instance dan downloadUrl dari file yang sama
+import api, { downloadUrl } from '../services/api'; 
 import { Container, Form, Button, Row, Col, Card, Alert } from 'react-bootstrap';
 
 const LetterForm = ({ isEdit = false, isView = false }) => {
@@ -49,7 +50,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
           setFormData({
             noUrut: letter.noUrut,
             noSurat: letter.noSurat,
-            tanggalTerima: letter.tanggalTerima?.split('T')[0] || '',
+            tanggalTerima: letter.tanggalTerima')[0] || '',
             tanggalDisposisi: letter.tanggalDisposisi?.split('T')[0] || '',
             asalSurat: letter.asalSurat || '',
             perihal: letter.perihal || '',
@@ -125,8 +126,12 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
           return;
         }
 
+        // Gunakan fungsi downloadUrl untuk membentuk URL download
+        const downloadEndpoint = `/api/letters/${id}/download`;
+        const fullDownloadUrl = downloadUrl(downloadEndpoint);
+
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/letters/${id}/download`,
+          fullDownloadUrl, // Ganti dengan URL dari fungsi utilitas
           {
             method: 'GET',
             headers: { 
@@ -169,6 +174,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
                 <Alert variant="info">
                   <strong>File:</strong> {formData.arsipDigital.split('/').pop()}
                   <br />
+                  {/* href sudah menggunakan downloadUrl */}
                   <a 
                     href={downloadUrl(formData.arsipDigital)}
                     target="_blank"
