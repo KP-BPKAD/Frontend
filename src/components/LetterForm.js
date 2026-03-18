@@ -1,8 +1,7 @@
 // src/components/LetterForm.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-// Impor api instance dan downloadUrl dari file yang sama
-import api, { downloadUrl } from '../services/api'; 
+import api from '../services/api';
 import { Container, Form, Button, Row, Col, Card, Alert } from 'react-bootstrap';
 
 const LetterForm = ({ isEdit = false, isView = false }) => {
@@ -162,6 +161,9 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
       }
     };
 
+
+    
+
     return (
       <Container className="mt-4">
         <Card>
@@ -174,9 +176,8 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
                 <Alert variant="info">
                   <strong>File:</strong> {formData.arsipDigital.split('/').pop()}
                   <br />
-                  {/* href sudah menggunakan downloadUrl */}
                   <a 
-                    href={downloadUrl(formData.arsipDigital)}
+                    href={`http://localhost:5000${formData.arsipDigital}`} 
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-sm btn-primary mt-2"
