@@ -50,7 +50,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
           setFormData({
             noUrut: letter.noUrut,
             noSurat: letter.noSurat,
-            tanggalTerima: letter.tanggalTerima')[0] || '',
+            tanggalTerima: letter.tanggalTerima?.split('T')[0] || '',
             tanggalDisposisi: letter.tanggalDisposisi?.split('T')[0] || '',
             asalSurat: letter.asalSurat || '',
             perihal: letter.perihal || '',
