@@ -126,10 +126,12 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
         }
 
         const response = await fetch(
-          `http://localhost:5000/api/letters/${id}/download`,
+          `${process.env.REACT_APP_API_URL}/api/letters/${id}/download`,
           {
             method: 'GET',
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { 
+              Authorization: `Bearer ${token}` 
+            }
           }
         );
 
