@@ -1,7 +1,7 @@
 // src/components/LetterForm.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api from '../services/api';
+import api, { downloadUrl } from '../services/api';
 import { Container, Form, Button, Row, Col, Card, Alert } from 'react-bootstrap';
 
 const LetterForm = ({ isEdit = false, isView = false }) => {
@@ -125,11 +125,17 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
           return;
         }
 
+
+        const downloadEndpoint = `/api/letters/${id}/download`;
+        const fullDownloadUrl = downloadUrl(downloadEndpoint);
+
         const response = await fetch(
-          `http://localhost:5000/api/letters/${id}/download`, // Bagian krusial: pastikan URL ini sesuai dengan endpoint backend Anda untuk download surat ${process.env.REACT_APP_API_URL}/api/letters/${id}/download`
+          fullDownloadUrl, // Ganti dengan URL dari fungsi utilitas
           {
             method: 'GET',
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { 
+              Authorization: `Bearer ${token}` 
+            }
           }
         );
 
@@ -168,7 +174,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
                   <strong>File:</strong> {formData.arsipDigital.split('/').pop()}
                   <br />
                   <a 
-                    href={`http://localhost:5000${formData.arsipDigital}`} 
+                    href={downloadUrl(formData.arsipDigital)} 
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-sm btn-primary mt-2"
