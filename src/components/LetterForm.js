@@ -125,13 +125,13 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
           return;
         }
 
-        const response = await fetch(
-          `http://localhost:5000/api/letters/${id}/download`,
-          {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/letters/${id}/download`, // ✅ Gunakan env var
+        {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
 
         if (!response.ok) {
           const error = await response.json();
@@ -168,7 +168,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
                   <strong>File:</strong> {formData.arsipDigital.split('/').pop()}
                   <br />
                   <a 
-                    href={`http://localhost:5000${formData.arsipDigital}`} 
+                    href={`${process.env.REACT_APP_API_URL}${formData.arsipDigital}`} 
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-sm btn-primary mt-2"
