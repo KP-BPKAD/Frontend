@@ -27,7 +27,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
 
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // 🔒 proteksi double-submit
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [classifications, setClassifications] = useState([]);
 
@@ -67,7 +67,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
         }
       } catch (err) {
         console.error('Gagal memuat data surat:', err);
-        alert('Gagal memuat data surat');
+        setError('Gagal memuat data surat. Coba lagi nanti.');
         navigate('/dashboard');
       }
     };
@@ -85,7 +85,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading || isSubmitting) return; // 🔒 Double-submit protection
+    if (loading || isSubmitting) return;
     setIsSubmitting(true);
     setError('');
     setLoading(true);
@@ -119,27 +119,15 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
   if (isView) {
     const handleDownload = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          alert('Silakan login ulang.');
-          return;
-        }
+        setError('');
+        setLoading(true);
 
-        const response = await fetch(
-          `http://localhost:5000/api/letters/${id}/download`,
-          {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        // Gunakan axios (api) — bukan fetch langsung ke localhost
+        const response = await api.get(`/letters/${id}/download`, {
+          responseType: 'blob', // Penting untuk download file
+        });
 
-        if (!response.ok) {
-          const error = await response.json();
-          alert(error.message || 'Gagal mengunduh surat.');
-          return;
-        }
-
-        const blob = await response.blob();
+        const blob = response.data;
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -148,11 +136,36 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+
         alert('Surat + data berhasil diunduh!');
       } catch (err) {
         console.error('Download error:', err);
-        alert('Gagal mengunduh. Coba lagi nanti.');
+        let msg = 'Gagal mengunduh. ';
+        if (err.response?.status === 404) {
+          msg += 'Surat tidak ditemukan.';
+        } else if (err.response?.status === 403) {
+          msg += 'Akses ditolak.';
+        } else if (err.request) {
+          msg += 'Koneksi ke server gagal. Pastikan backend aktif.';
+        } else {
+          msg += err.message || 'Terjadi kesalahan tak terduga.';
+        }
+        setError(msg);
+        alert(msg);
+      } finally {
+        setLoading(false);
       }
+    };
+
+    // Helper: Dapatkan URL file yang aman (gunakan baseURL dari api)
+    const getFileUrl = () => {
+      if (!formData.arsipDigital) return '';
+      // Jika arsipDigital adalah path relatif seperti '/uploads/xxx.pdf'
+      // dan backend menyajikannya di root (misal: https://backend-xxx.up.railway.app/uploads/...)
+      // maka kita gabungkan dengan baseURL tanpa '/api'
+      const baseUrl = api.defaults.baseURL;
+      const base = baseUrl.endsWith('/api') ? baseUrl.slice(0, -4) : baseUrl;
+      return `${base}${formData.arsipDigital}`;
     };
 
     return (
@@ -168,7 +181,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
                   <strong>File:</strong> {formData.arsipDigital.split('/').pop()}
                   <br />
                   <a 
-                    href={`http://localhost:5000${formData.arsipDigital}`} 
+                    href={getFileUrl()} 
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-sm btn-primary mt-2"
@@ -219,8 +232,12 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
               <Button variant="secondary" onClick={() => navigate(-1)}>
                 Kembali
               </Button>{' '}
-              <Button variant="success" onClick={handleDownload}>
-                Unduh Surat & Data
+              <Button 
+                variant="success" 
+                onClick={handleDownload}
+                disabled={loading}
+              >
+                {loading ? 'Mengunduh...' : 'Unduh Surat & Data'}
               </Button>
             </div>
           </Card.Body>
@@ -413,7 +430,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
               <Form.Label>Arsip Digital (PDF/DOCX/XLSX)</Form.Label>
               <Form.Control
                 type="file"
-                accept=".pdf,.docx,.xlsx"
+                accept=".pdf,.docx,."
                 onChange={(e) => setFile(e.target.files[0])}
               />
             </Form.Group>
