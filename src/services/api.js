@@ -1,22 +1,13 @@
-// src/services/api.js
 import axios from 'axios';
 
+// 🔴 HARDCODE URL BACKEND — JANGAN DIUBAH LAGI
+const API_BASE_URL = 'https://backend-production-366f1.up.railway.app/api';
 
-
-// Baagian Paling Krusil yang perlu unutk diperhatikan yang mana baseURL nya 
-// harus disesuaikan dengan URL backend Anda. 
-// Jika backend Anda berjalan di localhost pada port 5000, 
-// maka baseURL sudah benar. 
-// Namun, jika Anda menggunakan URL yang berbeda 
-// (misalnya, jika backend Anda di-deploy ke server), 
-// pastikan untuk mengganti baseURL sesuai dengan URL backend Anda. 
-// Contohnya:
-const API = axios.create({
-  baseURL: 'https://backend-production-366f1.up.railway.app/api',
+const api = axios.create({
+  baseURL: API_BASE_URL,
 });
 
-// Tambahkan token otomatis ke setiap request
-API.interceptors.request.use((config) => {
+api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -24,4 +15,4 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-export default API;
+export default api;
