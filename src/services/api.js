@@ -1,10 +1,8 @@
 import axios from 'axios';
 
 // 🔴 HARDCODE URL BACKEND — JANGAN DIUBAH LAGI
-const API_BASE_URL = 'https://backend-production-366f1.up.railway.app/api';
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
+const API = axios.create({
+  baseURL: 'https://backend-production-366f1.up.railway.app/api',
 });
 
 api.interceptors.request.use((config) => {
