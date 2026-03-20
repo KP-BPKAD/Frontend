@@ -125,13 +125,14 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
           return;
         }
 
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/letters/${id}/download`, // ✅ Gunakan env var
-        {
-          method: 'GET',
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+        // ✅ GANTI: Gunakan REACT_APP_API_URL
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/letters/${id}/download`,
+          {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
 
         if (!response.ok) {
           const error = await response.json();
@@ -167,6 +168,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
                 <Alert variant="info">
                   <strong>File:</strong> {formData.arsipDigital.split('/').pop()}
                   <br />
+                  {/* ✅ GANTI: Gunakan REACT_APP_API_URL */}
                   <a 
                     href={`${process.env.REACT_APP_API_URL}${formData.arsipDigital}`} 
                     target="_blank"
