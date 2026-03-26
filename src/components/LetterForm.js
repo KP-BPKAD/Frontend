@@ -125,6 +125,7 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
           return;
         }
 
+        // ✅ Gunakan URL backend langsung untuk download
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/api/letters/${id}/download`,
           {
@@ -155,22 +156,40 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
     };
 
     const openFileInNewTab = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          alert('Silakan login ulang.');
-          return;
-        }
+      // ✅ Hanya gunakan window.open ke URL backend langsung
+      // Tidak menggunakan fetch untuk membuka file di tab baru
+      // karena tujuannya adalah navigasi, bukan pengambilan data untuk diproses di frontend.
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Silakan login ulang.');
+        return;
+      }
 
-        // ❗️ Penting: Jangan kirim Authorization untuk file statis jika backend tidak proteksi
-        // Tapi karena kita tidak yakin, kita tetap kirim — jika backend menolak, ganti ke tanpa token
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}${formData.arsipDigital}`,
-          {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${token}` }
+      // Gunakan URL backend langsung untuk membuka file
+      const fileUrl = `${process.env.REACT_APP_API_URL}${formData.arsipDigital}`;
+
+      // Tambahkan token ke query params jika backend mendukungnya
+      // atau pastikan file diakses melalui middleware auth jika perlu
+      // Contoh jika backend mendukung token di query param:
+      // const fileUrlWithToken = `${fileUrl}?token=${encodeURIComponent(token)}`;
+      // window.open(fileUrlWithToken, '_blank');
+
+      // Untuk saat ini, coba buka langsung (mengasumsikan express.static di server.js tidak memerlukan header auth)
+      // Jika backend memerlukan auth header, maka fetch -> blob -> window.open adalah satu-satunya cara.
+      // Namun, karena openFileInNewTab biasanya untuk pratinjau, kita coba buka langsung dulu.
+      // Jika gagal karena auth, maka kita harus kembali ke metode fetch -> blob.
+      // Kita asumsikan backend (dengan express.static) bisa mengakses file tanpa header auth tambahan
+      // atau middleware auth di server.js tidak menghalangi akses ke /uploads/*.
+      // Jika middleware auth diaktifkan untuk semua rute termasuk /uploads/*,
+      // maka kita harus tetap menggunakan fetch -> blob.
+      // Kita coba fetch -> blob dulu untuk keamanan dan kontrol penuh.
+      try {
+        const response = await fetch(fileUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
           }
-        );
+        });
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -178,28 +197,20 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
         }
 
         const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const newTab = window.open(url, '_blank');
+        const blobUrl = window.URL.createObjectURL(blob);
+        const newTab = window.open(blobUrl, '_blank', 'noopener,noreferrer');
         if (!newTab) {
           alert('Popup diblokir. Izinkan popup untuk membuka file.');
         }
+        // Penting: Revoke object URL setelah tab ditutup atau setelah delay jika tidak bisa deteksi close
+        // Kita abaikan revoke untuk sementara agar file tetap bisa dibuka di tab baru
+        // window.URL.revokeObjectURL(blobUrl);
       } catch (err) {
         console.error('Open file error:', err);
-        // Jika gagal dengan token, coba tanpa token (untuk file publik)
-        try {
-          const response = await fetch(`${process.env.REACT_APP_API_URL}${formData.arsipDigital}`, {
-            method: 'GET'
-          });
-          if (!response.ok) throw new Error('Gagal membuka file (tanpa token).');
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          const newTab = window.open(url, '_blank');
-          if (!newTab) alert('Popup diblokir. Izinkan popup.');
-        } catch (fallbackErr) {
-          alert('Gagal membuka file. Silakan unduh saja.');
-        }
+        alert('Gagal membuka file. Silakan unduh dulu.');
       }
     };
+
 
     return (
       <Container className="mt-4">
@@ -233,12 +244,12 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
                 <p><strong>Tanggal Disposisi:</strong> {formData.tanggalDisposisi ? new Date(formData.tanggalDisposisi).toLocaleDateString() : '-'}</p>
                 <p><strong>Asal Surat:</strong> {formData.asalSurat}</p>
                 <p><strong>Penerima:</strong> {formData.penerimaEmail || '–'}</p>
-                <p><strong>Klasifikasi:</strong> 
+                <p><strong>Klasifikasi:</strong>
                   {formData.klasifikasiId && (
                     classifications.find(cls => cls._id === formData.klasifikasiId) ? (
-                      <span 
+                      <span
                         className="badge"
-                        style={{ 
+                        style={{
                           backgroundColor: classifications.find(cls => cls._id === formData.klasifikasiId)?.warna || '#007bff',
                           color: '#fff'
                         }}
