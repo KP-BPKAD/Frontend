@@ -338,12 +338,6 @@ const Report = () => {
         </Button>
       </div>
 
-            <div className="mt-3">
-        <Button variant="secondary" onClick={() => navigate(-1)}>
-          Kembali
-        </Button>
-      </div>
-      
     </Container>
   );
 };
