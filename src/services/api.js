@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-// ✅ GUNAKAN FULL URL DENGAN PROTOCOL
-const API_BASE_URL = 'https://backend-production-b08e.up.railway.app';
+// 🔴 HARDCODE URL BACKEND — JANGAN DIUBAH LAGI
+const API_BASE_URL = 'https://backend-production-b08e.up.railway.app/api';
 
 const api = axios.create({
-  baseURL: API_BASE_URL, // Gunakan URL lengkap
+  baseURL: API_BASE_URL,
 });
 
 api.interceptors.request.use((config) => {
