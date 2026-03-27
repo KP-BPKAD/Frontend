@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-// 🔴 HARDCODE URL BACKEND — JANGAN DIUBAH LAGI
-const API_BASE_URL = 'https://backend-production-b08e.up.railway.app/api/v1';
-
+// ✅ Gunakan environment variable
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
