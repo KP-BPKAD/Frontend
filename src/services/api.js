@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-// ✅ Gunakan environment variable
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+// ✅ GUNAKAN FULL URL DENGAN PROTOCOL
+const API_BASE_URL = 'https://backend-production-b08e.up.railway.app';
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_BASE_URL, // Gunakan URL lengkap
 });
 
 api.interceptors.request.use((config) => {
