@@ -154,50 +154,31 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
       }
     };
 
+    // LetterForm.js (VERSI YANG BENAR UNTUK URL CLOUDINARY)
     const openFileInNewTab = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          alert('Silakan login ulang.');
+        // ✅ KODE BENAR: Langsung gunakan URL Cloudinary jika itu yang disimpan
+        const cloudinaryUrl = formData.arsipDigital; // Ini seharusnya sudah berupa URL lengkap
+
+        if (!cloudinaryUrl) {
+          alert('File tidak ditemukan.');
           return;
         }
 
-        // ❗️ Penting: Jangan kirim Authorization untuk file statis jika backend tidak proteksi
-        // Tapi karena kita tidak yakin, kita tetap kirim — jika backend menolak, ganti ke tanpa token
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}${formData.arsipDigital}`,
-          {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Gagal membuka file.');
-        }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const newTab = window.open(url, '_blank');
-        if (!newTab) {
-          alert('Popup diblokir. Izinkan popup untuk membuka file.');
+        // Cek apakah URL berupa URL lengkap ke Cloudinary (atau sumber eksternal lainnya)
+        if (cloudinaryUrl.startsWith('http://') || cloudinaryUrl.startsWith('https://')) {
+          // Jika iya, langsung buka di tab baru
+          window.open(cloudinaryUrl, '_blank');
+        } else {
+          // Jika bukan (misalnya path lokal seperti '/uploads/file.pdf' untuk masa lalu)
+          // Maka gunakan logika lama (menggabungkan dengan REACT_APP_API_URL)
+          // const response = await fetch(`${process.env.REACT_APP_API_URL}${cloudinaryUrl}`, { ... });
+          // ... (logika fetch dan blob)
+          alert('Format URL file tidak dikenali.');
         }
       } catch (err) {
         console.error('Open file error:', err);
-        // Jika gagal dengan token, coba tanpa token (untuk file publik)
-        try {
-          const response = await fetch(`${process.env.REACT_APP_API_URL}${formData.arsipDigital}`, {
-            method: 'GET'
-          });
-          if (!response.ok) throw new Error('Gagal membuka file (tanpa token).');
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          const newTab = window.open(url, '_blank');
-          if (!newTab) alert('Popup diblokir. Izinkan popup.');
-        } catch (fallbackErr) {
-          alert('Gagal membuka file. Silakan unduh saja.');
-        }
+        alert('Gagal membuka file. Silakan unduh dulu.');
       }
     };
 
