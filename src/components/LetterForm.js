@@ -456,6 +456,14 @@ const LetterForm = ({ isEdit = false, isView = false }) => {
           </Form>
         </Card.Body>
       </Card>
+
+
+            <div className="mt-3">
+        <Button variant="secondary" onClick={() => navigate(-1)}>
+          Kembali
+        </Button>
+      </div>
+      
     </Container>
   );
 };

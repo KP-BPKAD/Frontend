@@ -194,6 +194,20 @@ const AdminUsers = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+
+            <div className="mt-3">
+        <Button variant="secondary" onClick={() => navigate(-1)}>
+          Kembali
+        </Button>
+      </div>
+
+            <div className="mt-3">
+        <Button variant="secondary" onClick={() => navigate(-1)}>
+          Kembali
+        </Button>
+      </div>
+      
     </Container>
   );
 };
