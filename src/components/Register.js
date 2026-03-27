@@ -99,7 +99,7 @@ const Register = () => {
                 <Form.Label className="fw-medium">Email</Form.Label>
                 <Form.Control
                   type="email"
-                  placeholder="mikasa@gmail.com"
+                  placeholder="user@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
